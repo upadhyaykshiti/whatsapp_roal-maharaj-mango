@@ -3,3 +3,6 @@ dist
 .wwebjs_auth
 
 .env
+.env.local
+.env.development
+.env.production
