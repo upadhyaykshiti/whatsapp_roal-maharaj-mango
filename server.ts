@@ -87,7 +87,7 @@
 import express from 'express'
 import cors from 'cors'
 import { Client, LocalAuth } from 'whatsapp-web.js'
-// import qrcode from 'qrcode-terminal'
+import qrcode from 'qrcode-terminal'
 import chromium from '@sparticuz/chromium'
 
 const app = express()
@@ -137,38 +137,16 @@ async function initializeWhatsApp() {
   const client = await createClient()
 
   // client.on('qr', (qr) => {
-    // console.log('\n📱 Scan this QR with WhatsApp:\n')
+    client.on('qr', async () => {
+    console.log('\n📱 Scan this QR with WhatsApp:\n')
     // qrcode.generate(qr, { small: true })
-  //   client.on('qr', async () => {
-  //     console.log('📱 Requesting pairing code...')
+    // client.on('qr', async () => {
+      console.log('📱 Requesting pairing code...')
 
-  //     const code = await client.requestPairingCode('16478898529')
-
-  //     console.log('\n🔑 Pairing Code:', code)
-  //   })
-  // })
-  let pairingCodeRequested = false
-
-  client.on('qr', async () => {
-    console.log('\n📱 WhatsApp login started...\n')
-
-    if (pairingCodeRequested) return
-
-    pairingCodeRequested = true
-
-    try {
-      const code = await client.requestPairingCode(
-        process.env.WHATSAPP_PHONE!
-      )
+      const code = await client.requestPairingCode('16478898529')
 
       console.log('\n🔑 Pairing Code:', code)
-    } catch (error) {
-      console.error('❌ Pairing code error:', error)
-    }
-  })
-
-  client.on('loading_screen', (percent, message) => {
-    console.log(`⌛ Loading ${percent}% - ${message}`)
+    // })
   })
 
   client.on('authenticated', () => {
@@ -185,38 +163,9 @@ async function initializeWhatsApp() {
     global.whatsappReady = false
   })
 
-
-
-  setTimeout(async () => {
-    try {
-      if (!global.whatsappReady) {
-        console.log('📱 Forcing pairing code generation...')
-
-        const code = await client.requestPairingCode(
-          process.env.WHATSAPP_PHONE!
-        )
-
-        console.log('\n🔑 Pairing Code:', code)
-      }
-    } catch (err) {
-      console.error('❌ Forced pairing error:', err)
-    }
-  }, 15000)
-
   await client.initialize()
 
   global.whatsappClient = client
 }
 
 initializeWhatsApp()
-
-
-const PORT = process.env.PORT || 3000
-
-app.get('/', (_, res) => {
-  res.send('WhatsApp server running')
-})
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`)
-})
