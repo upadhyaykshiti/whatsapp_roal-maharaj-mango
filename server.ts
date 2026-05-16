@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import { Client, LocalAuth } from 'whatsapp-web.js'
 import qrcode from 'qrcode-terminal'
-import puppeteer from 'puppeteer'
 
 const app = express()
 
@@ -29,8 +28,6 @@ const client =
     }),
     puppeteer: {
       headless: true,   
-       
-      executablePath: puppeteer.executablePath(),
 
       args: [
         '--no-sandbox',
