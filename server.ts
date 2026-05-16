@@ -1,17 +1,104 @@
+// import express from 'express'
+// import cors from 'cors'
+// import { Client, LocalAuth } from 'whatsapp-web.js'
+// import qrcode from 'qrcode-terminal'
+// import chromium from '@sparticuz/chromium'
+
+// const app = express()
+
+// app.use(cors())
+// app.use(express.json())
+
+
+// declare global {
+//   // eslint-disable-next-line no-var
+//   var whatsappClient: Client | undefined
+//   // eslint-disable-next-line no-var
+//   var whatsappReady: boolean | undefined
+// }
+
+// global.whatsappReady = global.whatsappReady || false
+
+// let isInitializing = false
+
+// const client =
+//   global.whatsappClient ||
+//   new Client({
+//     authStrategy: new LocalAuth({
+//       clientId: 'royal-maharaja-mango',
+//     }),
+//     puppeteer: {
+
+//       executablePath: await chromium.executablePath(),
+
+
+//       headless: true,  
+      
+
+
+//       // args: [
+//       //   '--no-sandbox',
+//       //   '--disable-setuid-sandbox',
+//       //   '--disable-dev-shm-usage',
+//       //   '--disable-gpu',
+//       //   '--single-process',
+//       //   '--no-zygote',
+
+//       // ],
+//       args: [
+//         ...chromium.args,
+//         '--no-sandbox',
+//         '--disable-setuid-sandbox',
+//       ],
+//     },
+//   })
+
+// if (!global.whatsappClient && !isInitializing) {
+//   isInitializing = true
+
+//   console.log('🚀 Initializing WhatsApp client...')
+
+//   client.on('qr', (qr) => {
+//     console.log('\n📱 Scan this QR with WhatsApp:\n')
+//     qrcode.generate(qr, { small: true })
+//   })
+
+//   client.on('authenticated', () => {
+//     console.log('🔐 WhatsApp authenticated')
+//   })
+
+//   client.on('ready', () => {
+//     console.log('✅ WhatsApp client ready!')
+//     global.whatsappReady = true
+//   })
+
+//   client.on('disconnected', (reason) => {
+//     console.log('❌ WhatsApp disconnected:', reason)
+//     global.whatsappReady = false
+//   })
+
+//   client.initialize()
+
+//   global.whatsappClient = client
+// }
+
+
+
 import express from 'express'
 import cors from 'cors'
 import { Client, LocalAuth } from 'whatsapp-web.js'
 import qrcode from 'qrcode-terminal'
+import chromium from '@sparticuz/chromium'
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 
-
 declare global {
   // eslint-disable-next-line no-var
   var whatsappClient: Client | undefined
+
   // eslint-disable-next-line no-var
   var whatsappReady: boolean | undefined
 }
@@ -20,32 +107,34 @@ global.whatsappReady = global.whatsappReady || false
 
 let isInitializing = false
 
-const client =
-  global.whatsappClient ||
-  new Client({
+async function createClient() {
+  return new Client({
     authStrategy: new LocalAuth({
       clientId: 'royal-maharaja-mango',
     }),
+
     puppeteer: {
-      headless: true,  
-      
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH,
+      executablePath: await chromium.executablePath(),
+
+      headless: true,
 
       args: [
+        ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-
       ],
     },
   })
+}
 
-if (!global.whatsappClient && !isInitializing) {
+async function initializeWhatsApp() {
+  if (global.whatsappClient || isInitializing) return
+
   isInitializing = true
 
   console.log('🚀 Initializing WhatsApp client...')
+
+  const client = await createClient()
 
   client.on('qr', (qr) => {
     console.log('\n📱 Scan this QR with WhatsApp:\n')
@@ -66,7 +155,9 @@ if (!global.whatsappClient && !isInitializing) {
     global.whatsappReady = false
   })
 
-  client.initialize()
+  await client.initialize()
 
   global.whatsappClient = client
 }
+
+initializeWhatsApp()
