@@ -27,7 +27,7 @@ const client =
       clientId: 'royal-maharaja-mango',
     }),
     puppeteer: {
-      headless: false,    
+      headless: true,    
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
