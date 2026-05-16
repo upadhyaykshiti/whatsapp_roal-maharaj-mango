@@ -87,7 +87,7 @@
 import express from 'express'
 import cors from 'cors'
 import { Client, LocalAuth } from 'whatsapp-web.js'
-import qrcode from 'qrcode-terminal'
+// import qrcode from 'qrcode-terminal'
 import chromium from '@sparticuz/chromium'
 
 const app = express()
@@ -167,6 +167,10 @@ async function initializeWhatsApp() {
     }
   })
 
+  client.on('loading_screen', (percent, message) => {
+    console.log(`⌛ Loading ${percent}% - ${message}`)
+  })
+
   client.on('authenticated', () => {
     console.log('🔐 WhatsApp authenticated')
   })
@@ -180,6 +184,24 @@ async function initializeWhatsApp() {
     console.log('❌ WhatsApp disconnected:', reason)
     global.whatsappReady = false
   })
+
+
+
+  setTimeout(async () => {
+    try {
+      if (!global.whatsappReady) {
+        console.log('📱 Forcing pairing code generation...')
+
+        const code = await client.requestPairingCode(
+          process.env.WHATSAPP_PHONE!
+        )
+
+        console.log('\n🔑 Pairing Code:', code)
+      }
+    } catch (err) {
+      console.error('❌ Forced pairing error:', err)
+    }
+  }, 15000)
 
   await client.initialize()
 
