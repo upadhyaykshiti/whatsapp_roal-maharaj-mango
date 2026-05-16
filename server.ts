@@ -136,16 +136,36 @@ async function initializeWhatsApp() {
 
   const client = await createClient()
 
-    client.on('qr', (qr) => {
-    console.log('\n📱 Scan this QR with WhatsApp:\n')
-    // qrcode.generate(qr, { small: true })
-    client.on('qr', async () => {
-      console.log('📱 Requesting pairing code...')
+  let pairingCodeGenerated = false
 
-      const code = await client.requestPairingCode('16478898529')
 
-      console.log('\n🔑 Pairing Code:', code)
-    })
+    // client.on('qr', (qr) => {
+    client.on('qr', async (qr) => {
+      console.log('\n📱 Scan this QR with WhatsApp:\n')
+      qrcode.generate(qr, { small: true })
+
+      if (pairingCodeGenerated) return
+
+        pairingCodeGenerated = true
+
+  try {
+    console.log('\n📱 Generating pairing code...\n')
+
+    const code = await client.requestPairingCode(
+      '16478898529'
+    )
+
+    console.log(`\n🔑 Pairing Code: ${code}\n`)
+  } catch (err) {
+    console.error('❌ Pairing error:', err)
+  }
+    // client.on('qr', async () => {
+    //   console.log('📱 Requesting pairing code...')
+
+    //   const code = await client.requestPairingCode('16478898529')
+
+    //   console.log('\n🔑 Pairing Code:', code)
+    // })
   })
 
   client.on('authenticated', () => {
