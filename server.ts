@@ -136,16 +136,35 @@ async function initializeWhatsApp() {
 
   const client = await createClient()
 
-  client.on('qr', (qr) => {
-    console.log('\n📱 Scan this QR with WhatsApp:\n')
+  // client.on('qr', (qr) => {
+    // console.log('\n📱 Scan this QR with WhatsApp:\n')
     // qrcode.generate(qr, { small: true })
-    client.on('qr', async () => {
-      console.log('📱 Requesting pairing code...')
+  //   client.on('qr', async () => {
+  //     console.log('📱 Requesting pairing code...')
 
-      const code = await client.requestPairingCode('16478898529')
+  //     const code = await client.requestPairingCode('16478898529')
+
+  //     console.log('\n🔑 Pairing Code:', code)
+  //   })
+  // })
+  let pairingCodeRequested = false
+
+  client.on('qr', async () => {
+    console.log('\n📱 WhatsApp login started...\n')
+
+    if (pairingCodeRequested) return
+
+    pairingCodeRequested = true
+
+    try {
+      const code = await client.requestPairingCode(
+        process.env.WHATSAPP_PHONE!
+      )
 
       console.log('\n🔑 Pairing Code:', code)
-    })
+    } catch (error) {
+      console.error('❌ Pairing code error:', error)
+    }
   })
 
   client.on('authenticated', () => {
@@ -168,3 +187,14 @@ async function initializeWhatsApp() {
 }
 
 initializeWhatsApp()
+
+
+const PORT = process.env.PORT || 3000
+
+app.get('/', (_, res) => {
+  res.send('WhatsApp server running')
+})
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`)
+})
