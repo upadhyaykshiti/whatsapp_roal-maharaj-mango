@@ -28,8 +28,9 @@ const client =
       clientId: 'royal-maharaja-mango',
     }),
     puppeteer: {
-      headless: true,    
-      executablePath:'/opt/render/.cache/puppeteer/chrome/linux-146.0.7680.31/chrome-linux64/chrome',
+      headless: true,   
+       
+      executablePath: puppeteer.executablePath(),
 
       args: [
         '--no-sandbox',
