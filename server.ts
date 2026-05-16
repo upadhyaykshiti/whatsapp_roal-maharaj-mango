@@ -45,6 +45,8 @@ async function createClient() {
   })
 }
 
+
+
 // async function initializeWhatsApp() {
 //   if (global.whatsappClient || isInitializing) return
 
@@ -54,43 +56,16 @@ async function createClient() {
 
 //   const client = await createClient()
 
-//   let pairingCodeGenerated = false
-
-
-//     // client.on('qr', (qr) => {
-//     client.on('qr', async (qr) => {
-//       console.log('\n📱 Scan this QR with WhatsApp:\n')
-//       qrcode.generate(qr, { small: true })
-
-//       if (pairingCodeGenerated) return
-
-//         pairingCodeGenerated = true
-
-//   try {
-//     console.log('\n📱 Generating pairing code...\n')
-
-//     const code = await client.requestPairingCode(
-//       '16478898529'
-//     )
-
-//     console.log(`\n🔑 Pairing Code: ${code}\n`)
-//   } catch (err) {
-//     console.error('❌ Pairing error:', err)
-//   }
 //   client.on('qr', async (qr) => {
-//   console.log('📱 Generating QR image...')
+//     console.log('\n📱 Scan this QR with WhatsApp:\n')
 
-//   await QRCode.toFile('./qr.png', qr)
+//     // terminal qr
+//     qrcode.generate(qr, { small: true })
 
-//   console.log('✅ QR saved as qr.png')
-// })
-//     // client.on('qr', async () => {
-//     //   console.log('📱 Requesting pairing code...')
+//     // browser qr image
+//     await QRCode.toFile('./qr.png', qr)
 
-//     //   const code = await client.requestPairingCode('16478898529')
-
-//     //   console.log('\n🔑 Pairing Code:', code)
-//     // })
+//     console.log('✅ QR saved as qr.png')
 //   })
 
 //   client.on('authenticated', () => {
@@ -122,35 +97,136 @@ async function initializeWhatsApp() {
 
   const client = await createClient()
 
+  // =========================
+  // QR EVENT
+  // =========================
   client.on('qr', async (qr) => {
-    console.log('\n📱 Scan this QR with WhatsApp:\n')
+    console.log('\n================ QR EVENT ================\n')
 
-    // terminal qr
-    qrcode.generate(qr, { small: true })
+    console.log('📱 QR received from WhatsApp')
 
-    // browser qr image
-    await QRCode.toFile('./qr.png', qr)
+    try {
+      // terminal qr
+      qrcode.generate(qr, { small: true })
 
-    console.log('✅ QR saved as qr.png')
+      console.log('✅ Terminal QR generated')
+
+      // save qr image
+      await QRCode.toFile('./qr.png', qr)
+
+      console.log('✅ QR image saved as qr.png')
+      console.log('🌐 Open: https://whatsapp-roal-maharaj-mango-1-3bo2.onrender.com/qr')
+
+      console.log('\n📲 Steps:')
+      console.log('1. Open WhatsApp on phone')
+      console.log('2. Settings')
+      console.log('3. Linked Devices')
+      console.log('4. Link a Device')
+      console.log('5. Scan QR')
+
+      console.log('\n==========================================\n')
+    } catch (err) {
+      console.error('❌ QR generation error:', err)
+    }
   })
 
+  // =========================
+  // AUTHENTICATED
+  // =========================
   client.on('authenticated', () => {
-    console.log('🔐 WhatsApp authenticated')
+    console.log('\n🔐 WhatsApp authenticated successfully!\n')
   })
 
-  client.on('ready', () => {
-    console.log('✅ WhatsApp client ready!')
+  // =========================
+  // AUTH FAILURE
+  // =========================
+  client.on('auth_failure', (msg) => {
+    console.log('\n❌ AUTH FAILURE\n')
+    console.log(msg)
+  })
+
+  // =========================
+  // READY
+  // =========================
+  client.on('ready', async () => {
+    console.log('\n✅ WhatsApp client ready!\n')
+
     global.whatsappReady = true
+
+    try {
+      const info = client.info
+
+      console.log('📱 Account Info:')
+      console.log('👤 Push Name:', info.pushname)
+      console.log('📞 Number:', info.wid.user)
+      console.log('🆔 Wid:', info.wid._serialized)
+      console.log('📡 Platform:', info.platform)
+
+      console.log('\n🎉 WhatsApp fully connected and ready!\n')
+    } catch (err) {
+      console.error('❌ Error getting account info:', err)
+    }
   })
 
+  // =========================
+  // LOADING SCREEN
+  // =========================
+  client.on('loading_screen', (percent, message) => {
+    console.log(`⏳ Loading Screen: ${percent}% - ${message}`)
+  })
+
+  // =========================
+  // STATE CHANGE
+  // =========================
+  client.on('change_state', (state) => {
+    console.log('🔄 State changed:', state)
+  })
+
+  // =========================
+  // DISCONNECTED
+  // =========================
   client.on('disconnected', (reason) => {
-    console.log('❌ WhatsApp disconnected:', reason)
+    console.log('\n❌ WhatsApp disconnected\n')
+    console.log('Reason:', reason)
+
     global.whatsappReady = false
   })
 
-  await client.initialize()
+  // =========================
+  // MESSAGE RECEIVED
+  // =========================
+  client.on('message', async (message) => {
+    console.log('\n📩 New Message Received')
+    console.log('From:', message.from)
+    console.log('Body:', message.body)
+  })
 
-  global.whatsappClient = client
+  // =========================
+  // MESSAGE SENT
+  // =========================
+  client.on('message_create', async (message) => {
+    if (message.fromMe) {
+      console.log('\n📤 Message Sent')
+      console.log('To:', message.to)
+      console.log('Body:', message.body)
+    }
+  })
+
+  // =========================
+  // INITIALIZE
+  // =========================
+  try {
+    console.log('\n🚀 Starting WhatsApp initialization...\n')
+
+    await client.initialize()
+
+    console.log('✅ client.initialize() completed')
+
+    global.whatsappClient = client
+  } catch (err) {
+    console.error('\n❌ WhatsApp initialization error:\n')
+    console.error(err)
+  }
 }
 
 initializeWhatsApp()
