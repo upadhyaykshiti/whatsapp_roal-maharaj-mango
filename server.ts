@@ -242,6 +242,7 @@ async function createClient() {
   return new Client({
     authStrategy: new LocalAuth({
       clientId: 'royal-maharaja-mango',
+      dataPath: '/opt/render/project/src/sessions',
     }),
 
     webVersionCache: {
@@ -255,16 +256,26 @@ async function createClient() {
 
       headless: true,
 
-      args: [
-        ...chromium.args,
+      // args: [
+      //   ...chromium.args,
 
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--single-process',
-        '--no-zygote',
-      ],
+      //   '--no-sandbox',
+      //   '--disable-setuid-sandbox',
+      //   '--disable-dev-shm-usage',
+      //   '--disable-gpu',
+      //   '--single-process',
+      //   '--no-zygote',
+      // ],
+      args: [
+      ...chromium.args,
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--single-process',
+      '--no-zygote',
+      '--disable-accelerated-2d-canvas',
+    ],
     },
   })
 }
@@ -329,11 +340,28 @@ async function initializeWhatsApp() {
     console.log('🔄 STATE:', state)
   })
 
-  client.on('disconnected', (reason) => {
-    console.log('❌ DISCONNECTED:', reason)
+  // client.on('disconnected', (reason) => {
+  //   console.log('❌ DISCONNECTED:', reason)
 
-    global.whatsappReady = false
-  })
+  //   global.whatsappReady = false
+    
+  // })
+  client.on('disconnected', async (reason) => {
+  console.log('❌ DISCONNECTED:', reason)
+
+  global.whatsappReady = false
+
+  try {
+    await client.destroy()
+  } catch {}
+
+  global.whatsappClient = undefined
+  isInitializing = false
+
+  setTimeout(() => {
+    initializeWhatsApp()
+  }, 10000)
+})
 
   client.on('auth_failure', (msg) => {
     console.log('❌ AUTH FAILURE:', msg)
