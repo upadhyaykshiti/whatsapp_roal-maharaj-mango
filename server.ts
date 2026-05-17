@@ -216,6 +216,14 @@ async function initializeWhatsApp() {
     // ================= START =================
     console.log('🚀 Starting WhatsApp initialization...')
 
+    client.on('message', async (message) => {
+      console.log('📩 Message:', message.body)
+
+      if (message.body === 'hi') {
+        await message.reply('hello from railway 🚀')
+      }
+    })
+
     await client.initialize()
 
     console.log('📂 Session path:', '/data/sessions')
