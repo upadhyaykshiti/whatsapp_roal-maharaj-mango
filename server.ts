@@ -286,6 +286,43 @@ app.get('/health', (_, res) => {
   })
 })
 
+app.post('/send', async (req, res) => {
+  try {
+    const { phone, message } = req.body
+
+    if (!phone || !message) {
+      return res.status(400).json({
+        success: false,
+        error: 'phone and message required',
+      })
+    }
+
+    if (!global.whatsappClient || !global.whatsappReady) {
+      return res.status(500).json({
+        success: false,
+        error: 'WhatsApp not ready',
+      })
+    }
+
+    const chatId = `${phone}@c.us`
+
+    await global.whatsappClient.sendMessage(chatId, message)
+
+    console.log('✅ WhatsApp message sent')
+
+    return res.json({
+      success: true,
+    })
+  } catch (err) {
+    console.log('❌ SEND ERROR:', err)
+
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to send message',
+    })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`)
 })
