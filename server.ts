@@ -304,9 +304,21 @@ app.post('/send', async (req, res) => {
       })
     }
 
-    const chatId = `${phone}@c.us`
+    // const chatId = `${phone}@c.us`
+    const cleanPhone = phone.replace(/\D/g, '')
 
-    await global.whatsappClient.sendMessage(chatId, message)
+    const numberId = await global.whatsappClient.getNumberId(cleanPhone)
+
+    if (!numberId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Number is not on WhatsApp',
+      })
+    }
+
+    await global.whatsappClient.sendMessage(numberId._serialized, message)
+
+    // await global.whatsappClient.sendMessage(chatId, message)
 
     console.log('✅ WhatsApp message sent')
 
