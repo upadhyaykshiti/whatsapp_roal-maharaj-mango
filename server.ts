@@ -36,11 +36,20 @@ async function createClient() {
 
       headless: true,
 
+      // args: [
+      //   ...chromium.args,
+      //   '--no-sandbox',
+      //   '--disable-setuid-sandbox',
+      // ],
       args: [
-        ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-      ],
+    ...chromium.args,
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--single-process',
+    '--no-zygote',
+  ]
     },
   })
 }
