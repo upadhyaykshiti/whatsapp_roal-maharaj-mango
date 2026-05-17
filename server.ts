@@ -245,12 +245,14 @@ async function createClient() {
       dataPath: '/opt/render/project/src/sessions',
     }),
 
+    // webVersionCache: {
+    //   type: 'remote',
+    //   remotePath:
+    //     'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
+    // },
     webVersionCache: {
-      type: 'remote',
-      remotePath:
-        'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
+      type: 'none',
     },
-
     puppeteer: {
       executablePath: await chromium.executablePath(),
 
@@ -280,6 +282,152 @@ async function createClient() {
   })
 }
 
+// async function initializeWhatsApp() {
+//   if (global.whatsappClient || isInitializing) return
+
+//   isInitializing = true
+
+//   console.log('🚀 Initializing WhatsApp client...')
+
+//   const client = await createClient()
+
+//   console.log('✅ Client object created')
+
+//   client.on('qr', async (qr) => {
+//     console.log('\n================ QR EVENT ================\n')
+
+//     console.log('📱 QR received from WhatsApp')
+
+//     qrcode.generate(qr, { small: true })
+
+//     try {
+//       await QRCode.toFile('./qr.png', qr)
+
+//       console.log('✅ QR image saved')
+//       console.log(
+//         '🌐 Open: https://whatsapp-roal-maharaj-mango-1-3bo2.onrender.com/qr'
+//       )
+//     } catch (err) {
+//       console.log('❌ QR save failed:', err)
+//     }
+
+//     console.log('\n=========================================\n')
+//   })
+
+//   client.on('remote_session_saved', () => {
+//     console.log('💾 SESSION SAVED SUCCESSFULLY')
+//   })
+
+//   client.on('authenticated', () => {
+//     console.log('\n🔐 AUTHENTICATED EVENT FIRED\n')
+//   })
+
+//   client.on('ready', async () => {
+//     console.log('\n✅ READY EVENT FIRED\n')
+
+//     global.whatsappReady = true
+
+//     try {
+//       const info = client.info
+
+//       console.log('📱 WhatsApp Number:', info.wid.user)
+//       console.log('📱 Push Name:', info.pushname)
+//       console.log('📱 Platform:', info.platform)
+//     } catch (err) {
+//       console.log('❌ Error reading client info:', err)
+//     }
+//   })
+
+//   client.on('loading_screen', (percent, message) => {
+//     console.log(`⏳ Loading: ${percent}% - ${message}`)
+//   })
+
+//   client.on('change_state', (state) => {
+//     console.log('🔄 STATE:', state)
+//   })
+
+//   // client.on('disconnected', (reason) => {
+//   //   console.log('❌ DISCONNECTED:', reason)
+
+//   //   global.whatsappReady = false
+    
+//   // })
+//   client.on('disconnected', async (reason) => {
+//   console.log('❌ DISCONNECTED:', reason)
+
+//   global.whatsappReady = false
+
+//   try {
+//     await client.destroy()
+//   } catch {}
+
+//   global.whatsappClient = undefined
+//   isInitializing = false
+
+//   setTimeout(() => {
+//     initializeWhatsApp()
+//   }, 10000)
+// })
+
+//   client.on('auth_failure', (msg) => {
+//     console.log('❌ AUTH FAILURE:', msg)
+//   })
+
+//   process.on('uncaughtException', (err) => {
+//     console.log('❌ UNCAUGHT EXCEPTION:', err)
+//   })
+
+//   process.on('unhandledRejection', (err) => {
+//     console.log('❌ UNHANDLED REJECTION:', err)
+//   })
+
+//   setInterval(() => {
+//     const used = process.memoryUsage()
+
+//     console.log('\n========= MEMORY =========')
+
+//     console.log(
+//       `RSS: ${Math.round(used.rss / 1024 / 1024)} MB`
+//     )
+
+//     console.log(
+//       `Heap Used: ${Math.round(used.heapUsed / 1024 / 1024)} MB`
+//     )
+
+//     console.log('==========================\n')
+//   }, 15000)
+
+//   console.log('🚀 Starting WhatsApp initialization...')
+
+//   try {
+//     await client.initialize()
+
+//     console.log('📂 Session path:', '/opt/render/project/src/sessions')
+//     console.log('✅ client.initialize() completed')
+
+//     global.whatsappClient = client
+//   } catch (err) {
+//     console.log('❌ INITIALIZE ERROR:', err)
+//   }
+// }
+
+// MEMORY LOGGER (put OUTSIDE initializeWhatsApp)
+setInterval(() => {
+  const used = process.memoryUsage()
+
+  console.log('\n========= MEMORY =========')
+
+  console.log(
+    `RSS: ${Math.round(used.rss / 1024 / 1024)} MB`
+  )
+
+  console.log(
+    `Heap Used: ${Math.round(used.heapUsed / 1024 / 1024)} MB`
+  )
+
+  console.log('==========================\n')
+}, 15000)
+
 async function initializeWhatsApp() {
   if (global.whatsappClient || isInitializing) return
 
@@ -287,120 +435,128 @@ async function initializeWhatsApp() {
 
   console.log('🚀 Initializing WhatsApp client...')
 
-  const client = await createClient()
-
-  console.log('✅ Client object created')
-
-  client.on('qr', async (qr) => {
-    console.log('\n================ QR EVENT ================\n')
-
-    console.log('📱 QR received from WhatsApp')
-
-    qrcode.generate(qr, { small: true })
-
-    try {
-      await QRCode.toFile('./qr.png', qr)
-
-      console.log('✅ QR image saved')
-      console.log(
-        '🌐 Open: https://whatsapp-roal-maharaj-mango-1-3bo2.onrender.com/qr'
-      )
-    } catch (err) {
-      console.log('❌ QR save failed:', err)
-    }
-
-    console.log('\n=========================================\n')
-  })
-
-  client.on('authenticated', () => {
-    console.log('\n🔐 AUTHENTICATED EVENT FIRED\n')
-  })
-
-  client.on('ready', async () => {
-    console.log('\n✅ READY EVENT FIRED\n')
-
-    global.whatsappReady = true
-
-    try {
-      const info = client.info
-
-      console.log('📱 WhatsApp Number:', info.wid.user)
-      console.log('📱 Push Name:', info.pushname)
-      console.log('📱 Platform:', info.platform)
-    } catch (err) {
-      console.log('❌ Error reading client info:', err)
-    }
-  })
-
-  client.on('loading_screen', (percent, message) => {
-    console.log(`⏳ Loading: ${percent}% - ${message}`)
-  })
-
-  client.on('change_state', (state) => {
-    console.log('🔄 STATE:', state)
-  })
-
-  // client.on('disconnected', (reason) => {
-  //   console.log('❌ DISCONNECTED:', reason)
-
-  //   global.whatsappReady = false
-    
-  // })
-  client.on('disconnected', async (reason) => {
-  console.log('❌ DISCONNECTED:', reason)
-
-  global.whatsappReady = false
-
   try {
-    await client.destroy()
-  } catch {}
+    const client = await createClient()
 
-  global.whatsappClient = undefined
-  isInitializing = false
+    console.log('✅ Client object created')
 
-  setTimeout(() => {
-    initializeWhatsApp()
-  }, 10000)
-})
+    // ================= QR =================
+    client.on('qr', async (qr) => {
+      console.log('\n================ QR EVENT ================\n')
 
-  client.on('auth_failure', (msg) => {
-    console.log('❌ AUTH FAILURE:', msg)
-  })
+      console.log('📱 QR received from WhatsApp')
 
-  process.on('uncaughtException', (err) => {
-    console.log('❌ UNCAUGHT EXCEPTION:', err)
-  })
+      qrcode.generate(qr, { small: true })
 
-  process.on('unhandledRejection', (err) => {
-    console.log('❌ UNHANDLED REJECTION:', err)
-  })
+      try {
+        await QRCode.toFile('./qr.png', qr)
 
-  setInterval(() => {
-    const used = process.memoryUsage()
+        console.log('✅ QR image saved')
 
-    console.log('\n========= MEMORY =========')
+        console.log(
+          '🌐 Open: https://whatsapp-roal-maharaj-mango-1-3bo2.onrender.com/qr'
+        )
+      } catch (err) {
+        console.log('❌ QR save failed:', err)
+      }
 
-    console.log(
-      `RSS: ${Math.round(used.rss / 1024 / 1024)} MB`
-    )
+      console.log('\n=========================================\n')
+    })
 
-    console.log(
-      `Heap Used: ${Math.round(used.heapUsed / 1024 / 1024)} MB`
-    )
+    // ================= AUTH =================
+    client.on('authenticated', () => {
+      console.log('\n🔐 AUTHENTICATED EVENT FIRED\n')
+    })
 
-    console.log('==========================\n')
-  }, 15000)
+    client.on('auth_failure', (msg) => {
+      console.log('❌ AUTH FAILURE:', msg)
+    })
 
-  console.log('🚀 Starting WhatsApp initialization...')
+    client.on('remote_session_saved', () => {
+      console.log('💾 SESSION SAVED SUCCESSFULLY')
+    })
 
-  try {
+    // ================= READY =================
+    client.on('ready', async () => {
+      console.log('\n✅ READY EVENT FIRED\n')
+
+      global.whatsappReady = true
+
+      try {
+        const info = client.info
+
+        console.log('📱 WhatsApp Number:', info.wid.user)
+        console.log('📱 Push Name:', info.pushname)
+        console.log('📱 Platform:', info.platform)
+      } catch (err) {
+        console.log('❌ Error reading client info:', err)
+      }
+    })
+
+    // ================= STATE =================
+    client.on('change_state', (state) => {
+      console.log('🔄 STATE:', state)
+    })
+
+    client.on('loading_screen', (percent, message) => {
+      console.log(`⏳ Loading: ${percent}% - ${message}`)
+    })
+
+    // ================= DISCONNECT =================
+    client.on('disconnected', async (reason) => {
+      console.log('❌ DISCONNECTED:', reason)
+
+      global.whatsappReady = false
+
+      try {
+        await client.destroy()
+      } catch (err) {
+        console.log('❌ Destroy error:', err)
+      }
+
+      global.whatsappClient = undefined
+      isInitializing = false
+
+      console.log('🔄 Reconnecting in 10 seconds...')
+
+      setTimeout(() => {
+        initializeWhatsApp()
+      }, 10000)
+    })
+
+    // ================= PROCESS ERRORS =================
+    process.on('uncaughtException', (err) => {
+      console.log('❌ UNCAUGHT EXCEPTION:', err)
+    })
+
+    process.on('unhandledRejection', (err) => {
+      console.log('❌ UNHANDLED REJECTION:', err)
+    })
+
+    // ================= START =================
+    console.log('🚀 Starting WhatsApp initialization...')
+
     await client.initialize()
+
+    console.log('📂 Session path:', '/opt/render/project/src/sessions')
 
     console.log('✅ client.initialize() completed')
 
     global.whatsappClient = client
+
+    isInitializing = false
   } catch (err) {
     console.log('❌ INITIALIZE ERROR:', err)
+
+    global.whatsappClient = undefined
+
+    isInitializing = false
+
+    console.log('🔄 Retrying in 10 seconds...')
+
+    setTimeout(() => {
+      initializeWhatsApp()
+    }, 10000)
   }
 }
 
