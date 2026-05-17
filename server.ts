@@ -56,15 +56,27 @@ async function createClient() {
       //   '--single-process',
       //   '--no-zygote',
       // ],
-       args: [
-    ...chromium.args,
+  //      args: [
+  //   ...chromium.args,
 
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-gpu',
-    '--no-first-run',
-    '--no-zygote',
+  //   '--no-sandbox',
+  //   '--disable-setuid-sandbox',
+  //   '--disable-dev-shm-usage',
+  //   '--disable-gpu',
+  //   '--no-first-run',
+  //   '--no-zygote',
+  // ],
+    args: [
+  ...chromium.args,
+
+  '--no-sandbox',
+  '--disable-setuid-sandbox',
+  '--disable-dev-shm-usage',
+  '--disable-gpu',
+  '--no-first-run',
+  '--no-zygote',
+  '--single-process',
+  '--disable-extensions',
   ],
 
   timeout: 120000,
@@ -72,21 +84,21 @@ async function createClient() {
   })
 }
 
-setInterval(() => {
-  const used = process.memoryUsage()
+// setInterval(() => {
+//   const used = process.memoryUsage()
 
-  console.log('\n========= MEMORY =========')
+//   console.log('\n========= MEMORY =========')
 
-  console.log(
-    `RSS: ${Math.round(used.rss / 1024 / 1024)} MB`
-  )
+//   console.log(
+//     `RSS: ${Math.round(used.rss / 1024 / 1024)} MB`
+//   )
 
-  console.log(
-    `Heap Used: ${Math.round(used.heapUsed / 1024 / 1024)} MB`
-  )
+//   console.log(
+//     `Heap Used: ${Math.round(used.heapUsed / 1024 / 1024)} MB`
+//   )
 
-  console.log('==========================\n')
-}, 15000)
+//   console.log('==========================\n')
+// }, 15000)
 
 async function initializeWhatsApp() {
   if (global.whatsappClient || isInitializing) return
@@ -128,6 +140,12 @@ async function initializeWhatsApp() {
     // ================= AUTH =================
     client.on('authenticated', () => {
       console.log('\n🔐 AUTHENTICATED EVENT FIRED\n')
+
+      try {
+        if (fs.existsSync('./qr.png')) {
+          fs.unlinkSync('./qr.png')
+        }
+      } catch {}
     })
 
     client.on('auth_failure', (msg) => {
@@ -200,8 +218,7 @@ async function initializeWhatsApp() {
 
     await client.initialize()
 
-    console.log('📂 Session path:', './sessions')
-
+    console.log('📂 Session path:', '/data/sessions')
     console.log('✅ client.initialize() completed')
 
     global.whatsappClient = client
@@ -241,6 +258,14 @@ app.get('/qr', (_, res) => {
   res.sendFile(process.cwd() + '/qr.png')
 })
 
+app.get('/health', (_, res) => {
+  res.json({
+    status: 'ok',
+    whatsappReady: global.whatsappReady,
+  })
+})
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`)
 })
+
