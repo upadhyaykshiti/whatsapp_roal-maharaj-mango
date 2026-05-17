@@ -216,11 +216,24 @@ async function initializeWhatsApp() {
     // ================= START =================
     console.log('🚀 Starting WhatsApp initialization...')
 
+    // client.on('message', async (message) => {
+    //   console.log('📩 Message:', message.body)
+
+    //   if (message.body === 'hi') {
+    //     await message.reply('hello from railway 🚀')
+    //   }
+    // })
     client.on('message', async (message) => {
       console.log('📩 Message:', message.body)
+      console.log('📩 From:', message.from)
 
-      if (message.body === 'hi') {
-        await message.reply('hello from railway 🚀')
+      if (message.body.toLowerCase() === 'hi') {
+        await client.sendMessage(
+          message.from,
+          'hello from railway 🚀'
+        )
+
+        console.log('✅ Reply sent')
       }
     })
 
