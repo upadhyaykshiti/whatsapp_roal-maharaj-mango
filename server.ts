@@ -30,7 +30,7 @@ async function createClient() {
   return new Client({
     authStrategy: new LocalAuth({
       clientId: 'royal-maharaja-mango',
-      dataPath: './sessions',
+      dataPath: '/data/sessions',
     }),
 
     // webVersionCache: {
@@ -114,7 +114,9 @@ async function initializeWhatsApp() {
         console.log('✅ QR image saved')
 
         console.log(
-          '🌐 Open: https://whatsapp-roal-maharaj-mango-1-3bo2.onrender.com/qr'
+          '🌐 Open: https://whatsapproal-maharaj-mango-production.up.railway.app/qr'
+
+          // '🌐 Open: https://whatsapp-roal-maharaj-mango-1-3bo2.onrender.com/qr'
         )
       } catch (err) {
         console.log('❌ QR save failed:', err)
@@ -229,7 +231,13 @@ app.get('/', (_, res) => {
   res.send('WhatsApp server running')
 })
 
+// app.get('/qr', (_, res) => {
+//   res.sendFile(process.cwd() + '/qr.png')
+// })
+
 app.get('/qr', (_, res) => {
+  res.setHeader('Cache-Control', 'no-store')
+
   res.sendFile(process.cwd() + '/qr.png')
 })
 
