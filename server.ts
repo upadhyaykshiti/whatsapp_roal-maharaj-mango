@@ -268,16 +268,19 @@ async function createClient() {
       //   '--single-process',
       //   '--no-zygote',
       // ],
-      args: [
-      ...chromium.args,
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--single-process',
-      '--no-zygote',
-      '--disable-accelerated-2d-canvas',
-    ],
+       args: [
+    ...chromium.args,
+
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--no-first-run',
+    '--no-zygote',
+    '--single-process',
+  ],
+
+  timeout: 120000,
     },
   })
 }
