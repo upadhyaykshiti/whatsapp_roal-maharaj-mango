@@ -283,6 +283,106 @@ app.get('/health', (_, res) => {
   })
 })
 
+// app.post('/send', async (req, res) => {
+//   try {
+//     const { phone, message } = req.body
+
+//     if (!phone || !message) {
+//       return res.status(400).json({
+//         success: false,
+//         error: 'phone and message required',
+//       })
+//     }
+
+//     if (!global.whatsappClient || !global.whatsappReady) {
+//       return res.status(500).json({
+//         success: false,
+//         error: 'WhatsApp not ready',
+//       })
+//     }
+
+//     // const chatId = `${phone}@c.us`
+//     // const cleanPhone = phone.replace(/\D/g, '')
+//     const cleanPhone = phone.replace(/\D/g, '').trim()
+//     const numberId = await global.whatsappClient.getNumberId(cleanPhone)
+
+//     if (!numberId) {
+//       return res.status(400).json({
+//         success: false,
+//         error: 'Number is not on WhatsApp',
+//       })
+//     }
+
+//     console.log('📤 Sending to:', numberId._serialized)
+
+
+//     // await global.whatsappClient.sendMessage(
+//     //   numberId._serialized,
+//     //   message
+//     // )
+
+//     let attempts = 0
+//     let sent = false
+
+//     while (attempts < 3 && !sent) {
+//       try {
+//         const numberId =
+//           await global.whatsappClient.getNumberId(cleanPhone)
+
+//         if (!numberId) {
+//           return res.status(400).json({
+//             success: false,
+//             error: 'Number is not on WhatsApp',
+//           })
+//         }
+
+//         console.log('📤 Sending to:', numberId._serialized)
+
+//         await global.whatsappClient.sendMessage(
+//           numberId._serialized,
+//           message
+//         )
+
+//         sent = true
+
+//         console.log('✅ WhatsApp message sent')
+//           } catch (err) {
+//             attempts++
+
+//             console.log(
+//               `⚠️ Send attempt ${attempts} failed`,
+//               err
+//             )
+
+//             await new Promise((resolve) =>
+//               setTimeout(resolve, 3000)
+//             )
+//           }
+//     }
+
+//     if (!sent) {
+//       return res.status(500).json({
+//         success: false,
+//         error: 'Failed after retries',
+//       })
+//     }
+
+
+//     console.log('✅ WhatsApp message sent')
+
+//     return res.json({
+//       success: true,
+//     })
+//   } catch (err) {
+//     console.log('❌ SEND ERROR:', err)
+
+//     return res.status(500).json({
+//       success: false,
+//       error: 'Failed to send message',
+//     })
+//   }
+// })
+
 app.post('/send', async (req, res) => {
   try {
     const { phone, message } = req.body
@@ -301,63 +401,38 @@ app.post('/send', async (req, res) => {
       })
     }
 
-    // const chatId = `${phone}@c.us`
-    // const cleanPhone = phone.replace(/\D/g, '')
     const cleanPhone = phone.replace(/\D/g, '').trim()
-    const numberId = await global.whatsappClient.getNumberId(cleanPhone)
 
-    if (!numberId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Number is not on WhatsApp',
-      })
-    }
+    // DIRECT CHAT ID
+    const chatId = `${cleanPhone}@c.us`
 
-    console.log('📤 Sending to:', numberId._serialized)
-
-
-    // await global.whatsappClient.sendMessage(
-    //   numberId._serialized,
-    //   message
-    // )
+    console.log('📤 Sending to:', chatId)
 
     let attempts = 0
     let sent = false
 
     while (attempts < 3 && !sent) {
       try {
-        const numberId =
-          await global.whatsappClient.getNumberId(cleanPhone)
-
-        if (!numberId) {
-          return res.status(400).json({
-            success: false,
-            error: 'Number is not on WhatsApp',
-          })
-        }
-
-        console.log('📤 Sending to:', numberId._serialized)
-
         await global.whatsappClient.sendMessage(
-          numberId._serialized,
+          chatId,
           message
         )
 
         sent = true
 
         console.log('✅ WhatsApp message sent')
-          } catch (err) {
-            attempts++
+      } catch (err) {
+        attempts++
 
-            console.log(
-              `⚠️ Send attempt ${attempts} failed`,
-              err
-            )
+        console.log(
+          `⚠️ Send attempt ${attempts} failed`,
+          err
+        )
 
-            await new Promise((resolve) =>
-              setTimeout(resolve, 3000)
-            )
-          }
+        await new Promise((resolve) =>
+          setTimeout(resolve, 3000)
+        )
+      }
     }
 
     if (!sent) {
@@ -366,9 +441,6 @@ app.post('/send', async (req, res) => {
         error: 'Failed after retries',
       })
     }
-
-
-    console.log('✅ WhatsApp message sent')
 
     return res.json({
       success: true,
