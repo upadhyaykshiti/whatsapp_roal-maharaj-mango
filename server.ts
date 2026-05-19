@@ -46,37 +46,34 @@ async function createClient() {
 
       headless: true,
 
-      // args: [
-      //   ...chromium.args,
+  //   args: [
+  // ...chromium.args,
 
-      //   '--no-sandbox',
-      //   '--disable-setuid-sandbox',
-      //   '--disable-dev-shm-usage',
-      //   '--disable-gpu',
-      //   '--single-process',
-      //   '--no-zygote',
-      // ],
-  //      args: [
-  //   ...chromium.args,
-
-  //   '--no-sandbox',
-  //   '--disable-setuid-sandbox',
-  //   '--disable-dev-shm-usage',
-  //   '--disable-gpu',
-  //   '--no-first-run',
-  //   '--no-zygote',
+  // '--no-sandbox',
+  // '--disable-setuid-sandbox',
+  // '--disable-dev-shm-usage',
+  // '--disable-gpu',
+  // '--no-first-run',
+  // '--no-zygote',
+  // '--single-process',
+  // '--disable-extensions',
   // ],
-    args: [
-  ...chromium.args,
 
-  '--no-sandbox',
-  '--disable-setuid-sandbox',
-  '--disable-dev-shm-usage',
-  '--disable-gpu',
-  '--no-first-run',
-  '--no-zygote',
-  '--single-process',
-  '--disable-extensions',
+    args: [
+    ...chromium.args,
+
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--no-first-run',
+    '--no-zygote',
+    '--single-process',
+    '--disable-extensions',
+    '--disable-background-networking',
+    '--disable-background-timer-throttling',
+    '--disable-renderer-backgrounding',
+    '--disable-backgrounding-occluded-windows',
   ],
 
   timeout: 120000,
@@ -305,8 +302,8 @@ app.post('/send', async (req, res) => {
     }
 
     // const chatId = `${phone}@c.us`
-    const cleanPhone = phone.replace(/\D/g, '')
-
+    // const cleanPhone = phone.replace(/\D/g, '')
+    const cleanPhone = phone.replace(/\D/g, '').trim()
     const numberId = await global.whatsappClient.getNumberId(cleanPhone)
 
     if (!numberId) {
@@ -316,7 +313,14 @@ app.post('/send', async (req, res) => {
       })
     }
 
-    await global.whatsappClient.sendMessage(numberId._serialized, message)
+    console.log('📤 Sending to:', numberId._serialized)
+
+
+    // await global.whatsappClient.sendMessage(numberId._serialized, message)
+    await global.whatsappClient.sendMessage(
+      numberId._serialized,
+      message
+    )
 
     // await global.whatsappClient.sendMessage(chatId, message)
 
