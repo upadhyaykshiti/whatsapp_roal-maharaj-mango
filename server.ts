@@ -316,13 +316,57 @@ app.post('/send', async (req, res) => {
     console.log('📤 Sending to:', numberId._serialized)
 
 
-    // await global.whatsappClient.sendMessage(numberId._serialized, message)
-    await global.whatsappClient.sendMessage(
-      numberId._serialized,
-      message
-    )
+    // await global.whatsappClient.sendMessage(
+    //   numberId._serialized,
+    //   message
+    // )
 
-    // await global.whatsappClient.sendMessage(chatId, message)
+    let attempts = 0
+    let sent = false
+
+    while (attempts < 3 && !sent) {
+      try {
+        const numberId =
+          await global.whatsappClient.getNumberId(cleanPhone)
+
+        if (!numberId) {
+          return res.status(400).json({
+            success: false,
+            error: 'Number is not on WhatsApp',
+          })
+        }
+
+        console.log('📤 Sending to:', numberId._serialized)
+
+        await global.whatsappClient.sendMessage(
+          numberId._serialized,
+          message
+        )
+
+        sent = true
+
+        console.log('✅ WhatsApp message sent')
+          } catch (err) {
+            attempts++
+
+            console.log(
+              `⚠️ Send attempt ${attempts} failed`,
+              err
+            )
+
+            await new Promise((resolve) =>
+              setTimeout(resolve, 3000)
+            )
+          }
+    }
+
+    if (!sent) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed after retries',
+      })
+    }
+
 
     console.log('✅ WhatsApp message sent')
 
