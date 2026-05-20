@@ -17,7 +17,6 @@ declare global {
   // eslint-disable-next-line no-var
   var whatsappClient: Client | undefined
 
-  // eslint-disable-next-line no-var
   var whatsappReady: boolean | undefined
 }
 
