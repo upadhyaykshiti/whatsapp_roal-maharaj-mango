@@ -120,24 +120,15 @@ async function initializeWhatsApp() {
 
    
     // ================= AUTH =================
-    client.on('authenticated', async () => {
+      client.on('authenticated', async () => {
       console.log('\n🔐 AUTHENTICATED EVENT FIRED\n')
 
       try {
-        // delete qr
         if (fs.existsSync('./qr.png')) {
           fs.unlinkSync('./qr.png')
         }
-
-        // cleanup temp chromium files
-        fs.rmSync('/tmp', {
-          recursive: true,
-          force: true,
-        })
-
-        console.log('🧹 Temp cleanup done')
       } catch (err) {
-        console.log('❌ Cleanup error:', err)
+        console.log('❌ QR cleanup error:', err)
       }
     })
 
