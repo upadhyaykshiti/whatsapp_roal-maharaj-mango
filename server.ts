@@ -45,6 +45,7 @@ async function createClient() {
       executablePath: await chromium.executablePath(),
 
       headless: true,
+      userDataDir: '/tmp/chrome',
 
   //   args: [
   // ...chromium.args,
@@ -220,19 +221,19 @@ async function initializeWhatsApp() {
     //     await message.reply('hello from railway 🚀')
     //   }
     // })
-    client.on('message', async (message) => {
-      console.log('📩 Message:', message.body)
-      console.log('📩 From:', message.from)
+    // client.on('message', async (message) => {
+    //   console.log('📩 Message:', message.body)
+    //   console.log('📩 From:', message.from)
 
-      if (message.body.toLowerCase() === 'hi') {
-        await client.sendMessage(
-          message.from,
-          'hello from railway 🚀'
-        )
+    //   if (message.body.toLowerCase() === 'hi') {
+    //     await client.sendMessage(
+    //       message.from,
+    //       'hello from railway 🚀'
+    //     )
 
-        console.log('✅ Reply sent')
-      }
-    })
+    //     console.log('✅ Reply sent')
+    //   }
+    // })
 
     await client.initialize()
 
