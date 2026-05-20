@@ -81,21 +81,7 @@ async function createClient() {
   })
 }
 
-// setInterval(() => {
-//   const used = process.memoryUsage()
 
-//   console.log('\n========= MEMORY =========')
-
-//   console.log(
-//     `RSS: ${Math.round(used.rss / 1024 / 1024)} MB`
-//   )
-
-//   console.log(
-//     `Heap Used: ${Math.round(used.heapUsed / 1024 / 1024)} MB`
-//   )
-
-//   console.log('==========================\n')
-// }, 15000)
 
 async function initializeWhatsApp() {
   if (global.whatsappClient || isInitializing) return
@@ -177,20 +163,20 @@ async function initializeWhatsApp() {
 
         console.log('📱 WhatsApp Number:', info.wid.user)
         console.log('📱 Push Name:', info.pushname)
-        console.log('📱 Platform:', info.platform)
+        // console.log('📱 Platform:', info.platform)
       } catch (err) {
         console.log('❌ Error reading client info:', err)
       }
     })
 
     // ================= STATE =================
-    client.on('change_state', (state) => {
-      console.log('🔄 STATE:', state)
-    })
+    // client.on('change_state', (state) => {
+    //   console.log('🔄 STATE:', state)
+    // })
 
-    client.on('loading_screen', (percent, message) => {
-      console.log(`⏳ Loading: ${percent}% - ${message}`)
-    })
+    // client.on('loading_screen', (percent, message) => {
+    //   console.log(`⏳ Loading: ${percent}% - ${message}`)
+    // })
 
     // ================= DISCONNECT =================
     client.on('disconnected', async (reason) => {
