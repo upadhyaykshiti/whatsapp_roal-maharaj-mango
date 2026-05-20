@@ -109,7 +109,7 @@ async function initializeWhatsApp() {
         console.log('✅ QR image saved')
 
         console.log(
-          '🌐 Open: whatsapproal-maharaj-mango-production-d85a.up.railway.app/qr'
+          '🌐 Open: https://whatsapproal-maharaj-mango-production-d85a.up.railway.app/qr'
 
         )
       } catch (err) {
