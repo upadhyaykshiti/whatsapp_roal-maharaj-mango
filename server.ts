@@ -45,7 +45,6 @@ async function createClient() {
       executablePath: await chromium.executablePath(),
 
       headless: true,
-      userDataDir: '/tmp/chrome',
 
   //   args: [
   // ...chromium.args,
@@ -126,7 +125,6 @@ async function initializeWhatsApp() {
         console.log(
           '🌐 Open: https://whatsapproal-maharaj-mango-production.up.railway.app/qr'
 
-          // '🌐 Open: https://whatsapp-roal-maharaj-mango-1-3bo2.onrender.com/qr'
         )
       } catch (err) {
         console.log('❌ QR save failed:', err)
@@ -135,16 +133,30 @@ async function initializeWhatsApp() {
       console.log('\n=========================================\n')
     })
 
+   
     // ================= AUTH =================
-    client.on('authenticated', () => {
+    client.on('authenticated', async () => {
       console.log('\n🔐 AUTHENTICATED EVENT FIRED\n')
 
       try {
+        // delete qr
         if (fs.existsSync('./qr.png')) {
           fs.unlinkSync('./qr.png')
         }
-      } catch {}
+
+        // cleanup temp chromium files
+        fs.rmSync('/tmp', {
+          recursive: true,
+          force: true,
+        })
+
+        console.log('🧹 Temp cleanup done')
+      } catch (err) {
+        console.log('❌ Cleanup error:', err)
+      }
     })
+
+
 
     client.on('auth_failure', (msg) => {
       console.log('❌ AUTH FAILURE:', msg)
