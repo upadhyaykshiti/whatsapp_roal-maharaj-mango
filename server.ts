@@ -294,78 +294,6 @@ async function restartWhatsApp() {
   }
 }
 
-// app.post('/send', async (req, res) => {
-//   try {
-//     const { phone, message } = req.body
-
-//     if (!phone || !message) {
-//       return res.status(400).json({
-//         success: false,
-//         error: 'phone and message required',
-//       })
-//     }
-
-//     if (!global.whatsappClient || !global.whatsappReady) {
-//       return res.status(500).json({
-//         success: false,
-//         error: 'WhatsApp not ready',
-//       })
-//     }
-
-//     const cleanPhone = phone.replace(/\D/g, '').trim()
-
-//     // DIRECT CHAT ID
-//     const chatId = `${cleanPhone}@c.us`
-
-//     console.log('📤 Sending to:', chatId)
-
-//     let attempts = 0
-//     let sent = false
-
-//     while (attempts < 3 && !sent) {
-//       try {
-//         await global.whatsappClient.sendMessage(
-//           chatId,
-//           message
-//         )
-
-//         sent = true
-
-//         console.log('✅ WhatsApp message sent')
-//       } catch (err) {
-//         attempts++
-
-//         console.log(
-//           `⚠️ Send attempt ${attempts} failed`,
-//           err
-//         )
-
-//         await new Promise((resolve) =>
-//           setTimeout(resolve, 3000)
-//         )
-//       }
-//     }
-
-//     if (!sent) {
-//       return res.status(500).json({
-//         success: false,
-//         error: 'Failed after retries',
-//       })
-//     }
-
-//     return res.json({
-//       success: true,
-//     })
-//   } catch (err) {
-//     console.log('❌ SEND ERROR:', err)
-
-//     return res.status(500).json({
-//       success: false,
-//       error: 'Failed to send message',
-//     })
-//   }
-// })
-
 app.post('/send', async (req, res) => {
   try {
     const { phone, message } = req.body
@@ -377,34 +305,34 @@ app.post('/send', async (req, res) => {
       })
     }
 
+    if (!global.whatsappClient || !global.whatsappReady) {
+      return res.status(500).json({
+        success: false,
+        error: 'WhatsApp not ready',
+      })
+    }
+
     const cleanPhone = phone.replace(/\D/g, '').trim()
 
+    // DIRECT CHAT ID
     const chatId = `${cleanPhone}@c.us`
 
+    console.log('📤 Sending to:', chatId)
+
     let attempts = 0
+    let sent = false
 
-    while (attempts < 3) {
+    while (attempts < 3 && !sent) {
       try {
-        if (
-          !global.whatsappClient ||
-          !global.whatsappReady
-        ) {
-          throw new Error('WhatsApp not ready')
-        }
-
-        console.log('📤 Sending to:', chatId)
-
         await global.whatsappClient.sendMessage(
           chatId,
           message
         )
 
-        console.log('✅ WhatsApp message sent')
+        sent = true
 
-        return res.json({
-          success: true,
-        })
-      } catch (err: any) {
+        console.log('✅ WhatsApp message sent')
+      } catch (err) {
         attempts++
 
         console.log(
@@ -412,33 +340,21 @@ app.post('/send', async (req, res) => {
           err
         )
 
-        // DETACHED FRAME FIX
-        if (
-          err?.message?.includes('detached Frame') ||
-          err?.message?.includes('Target closed') ||
-          err?.message?.includes('Session closed')
-        ) {
-          console.log(
-            '♻️ Chromium crashed, restarting WhatsApp...'
-          )
-
-          await restartWhatsApp()
-
-          // WAIT FOR READY
-          await new Promise((resolve) =>
-            setTimeout(resolve, 15000)
-          )
-        } else {
-          await new Promise((resolve) =>
-            setTimeout(resolve, 3000)
-          )
-        }
+        await new Promise((resolve) =>
+          setTimeout(resolve, 3000)
+        )
       }
     }
 
-    return res.status(500).json({
-      success: false,
-      error: 'Failed after retries',
+    if (!sent) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed after retries',
+      })
+    }
+
+    return res.json({
+      success: true,
     })
   } catch (err) {
     console.log('❌ SEND ERROR:', err)
@@ -449,6 +365,90 @@ app.post('/send', async (req, res) => {
     })
   }
 })
+
+// app.post('/send', async (req, res) => {
+//   try {
+//     const { phone, message } = req.body
+
+//     if (!phone || !message) {
+//       return res.status(400).json({
+//         success: false,
+//         error: 'phone and message required',
+//       })
+//     }
+
+//     const cleanPhone = phone.replace(/\D/g, '').trim()
+
+//     const chatId = `${cleanPhone}@c.us`
+
+//     let attempts = 0
+
+//     while (attempts < 3) {
+//       try {
+//         if (
+//           !global.whatsappClient ||
+//           !global.whatsappReady
+//         ) {
+//           throw new Error('WhatsApp not ready')
+//         }
+
+//         console.log('📤 Sending to:', chatId)
+
+//         await global.whatsappClient.sendMessage(
+//           chatId,
+//           message
+//         )
+
+//         console.log('✅ WhatsApp message sent')
+
+//         return res.json({
+//           success: true,
+//         })
+//       } catch (err: any) {
+//         attempts++
+
+//         console.log(
+//           `⚠️ Send attempt ${attempts} failed`,
+//           err
+//         )
+
+//         // DETACHED FRAME FIX
+//         if (
+//           err?.message?.includes('detached Frame') ||
+//           err?.message?.includes('Target closed') ||
+//           err?.message?.includes('Session closed')
+//         ) {
+//           console.log(
+//             '♻️ Chromium crashed, restarting WhatsApp...'
+//           )
+
+//           await restartWhatsApp()
+
+//           // WAIT FOR READY
+//           await new Promise((resolve) =>
+//             setTimeout(resolve, 15000)
+//           )
+//         } else {
+//           await new Promise((resolve) =>
+//             setTimeout(resolve, 3000)
+//           )
+//         }
+//       }
+//     }
+
+//     return res.status(500).json({
+//       success: false,
+//       error: 'Failed after retries',
+//     })
+//   } catch (err) {
+//     console.log('❌ SEND ERROR:', err)
+
+//     return res.status(500).json({
+//       success: false,
+//       error: 'Failed to send message',
+//     })
+//   }
+// })
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`)
