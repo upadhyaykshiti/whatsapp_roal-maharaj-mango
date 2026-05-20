@@ -255,9 +255,7 @@ app.get('/', (_, res) => {
   res.send('WhatsApp server running')
 })
 
-// app.get('/qr', (_, res) => {
-//   res.sendFile(process.cwd() + '/qr.png')
-// })
+
 
 app.get('/qr', (_, res) => {
   res.setHeader('Cache-Control', 'no-store')
